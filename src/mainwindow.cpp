@@ -105,6 +105,8 @@ void MainWindow::processImage(QImage *image)
     painter.setPen(Qt::red);
 
     foreach(QRect* rect, *rectsOfInterest) {
+        rect->adjust(-3, -3, 3, 3);
+        painter.drawImage(*rect, *image, *rect);
         painter.drawRect(*rect);
     }
 

@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/ui/3Dcontrols">
+        <file>icons/arrow_down.svg</file>
+        <file>icons/arrow_up.svg</file>
+    </qresource>
+</RCC>

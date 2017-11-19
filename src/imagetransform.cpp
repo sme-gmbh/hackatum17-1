@@ -588,7 +588,6 @@ QList<QRect*>* ImageTransform::rectsOfInterest(QImage *image)
     }
 
     QList<QRect*>* rects = new QList<QRect*>();
-    QRect r;
 
     for (int y = 6; y < height - 6; y++) {
         for (int x = 6; x < width - 6; x++) {
@@ -597,7 +596,17 @@ QList<QRect*>* ImageTransform::rectsOfInterest(QImage *image)
                 QRect* neigbourRect = nextNeighbourRect(rects, QPoint(x, y));
 
                 if (neigbourRect == NULL) { // We need to create a new rect
-                    rects->append(new QRect(x, y, 1, 1));
+                    QRect* rect = new QRect(x, y, 1, 1);
+                    bool exchangeRect = false;
+                    foreach (QRect* r, *rects) {
+                        if (r->intersects(*rect)) {
+                            QRect united = r->united(*rect);
+                            *r = united;
+                            exchangeRect = true;
+                        }
+                    }
+                    if (!exchangeRect)
+                        rects->append(rect);
                 } else {    // we need to make an existing rect bigger
                     QRect united = neigbourRect->united(QRect(x, y, 1, 1));
                     *neigbourRect = united;
@@ -606,6 +615,28 @@ QList<QRect*>* ImageTransform::rectsOfInterest(QImage *image)
         }
     }
 
+    int i = 0;
+    int j = 0;
+
+    while (i < rects->length()) {
+        j = 0;
+        while (j < rects->length()) {
+            if (j <= i) {
+                j++;
+                continue;
+            }
+            if (rects->at(i)->intersects(*rects->at(j))) {
+                QRect united = rects->at(i)->united(*rects->at(j));
+                *rects->at(i) = united;
+                QRect* toDelete = rects->at(j);
+                rects->removeAt(j);
+                delete toDelete;
+                j--;
+            }
+            j++;
+        }
+        i++;
+    }
 
     delete poi;
     return rects;
