@@ -1,6 +1,7 @@
 #include "imagetransform.h"
 
 // Copyright Peter Diener
+// Contributor: Jonas Weigand
 
 ImageTransform::ImageTransform(QObject *parent) :
     QObject(parent)
@@ -155,7 +156,7 @@ QImage ImageTransform::extractImageRegion(QImage originalImage, QPolygonF polygo
 QImage* ImageTransform::highPassFilter(QImage* source)
 {
     QImage* hpfImage = new QImage(source->width(), source->height(), QImage::Format_ARGB32_Premultiplied);
-    hpfImage->fill(Qt::white);
+    hpfImage->fill(Qt::black);
 
     for (qint32 y = 1; y < (hpfImage->height() - 1); y++)
         for (qint32 x = 1; x < (hpfImage->width() -1 ); x++)
@@ -475,7 +476,7 @@ QImage* ImageTransform::rotateImage(char direction, QImage *image)
 
 }
 
-QImage ImageTransform::medianFilter(QImage *inputImage)
+QImage* ImageTransform::medianFilter(QImage *inputImage)
 {
     int width = inputImage->width();
     int height = inputImage->height();
@@ -488,27 +489,29 @@ QImage ImageTransform::medianFilter(QImage *inputImage)
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            long r, g, b;
-            r = medianShadow->pixelColor(x, y).red();
-            g = medianShadow->pixelColor(x, y).green();
-            b = medianShadow->pixelColor(x, y).blue();
+            int r, g, b;
+            QColor px1 = medianShadow->pixelColor(x, y);
+            r = px1.red();
+            g = px1.green();
+            b = px1.blue();
 
-            int dt = 60; // decayTime
+            int dt = 30; // decayTime
 
             r = r * (dt-1) / dt;
             g = g * (dt-1) / dt;
             b = b * (dt-1) / dt;
 
-            int ri = inputImage->pixelColor(x, y).red();
-            int gi = inputImage->pixelColor(x, y).green();
-            int bi = inputImage->pixelColor(x, y).blue();
+            QColor px2 = inputImage->pixelColor(x, y);
+            int ri = px2.red();
+            int gi = px2.green();
+            int bi = px2.blue();
 
-            if (ri >= r - 50)  r += ri / dt;
-            else          r /= 6;
-            if (gi >= g - 50)  g += gi / dt;
-            else          g /= 6;
-            if (bi >= b - 50)  b += bi / dt;
-            else          b /= 6;
+            if (ri >= r - 30)  r += ri / dt;
+            else          r /= 4;
+            if (gi >= g - 30)  g += gi / dt;
+            else          g /= 4;
+            if (bi >= b - 30)  b += bi / dt;
+            else          b /= 4;
 
             if (r > 255) r = 255;
             if (g > 255) g = 255;
@@ -517,5 +520,102 @@ QImage ImageTransform::medianFilter(QImage *inputImage)
             medianShadow->setPixelColor(x, y, QColor(r, g, b));
         }
     }
-    return *medianShadow;
+
+    QImage* out = new QImage(inputImage->size(), QImage::Format_RGB32);
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int r = medianShadow->pixelColor(x, y).red();
+            int g = medianShadow->pixelColor(x, y).green();
+            int b = medianShadow->pixelColor(x, y).blue();
+
+            if ((x < 8) || (y < 8) || (x > width - 8) || (y > height - 8)) {
+                r = 0;
+                g = 0;
+                b = 0;
+            }
+
+            r = (r*2 - 150) * 2;
+            g = (g*2 - 150) * 2;
+            b = (b*2 - 150) * 2;
+
+            if (r < 0) r = 0;
+            if (g < 0) g = 0;
+            if (b < 0) b = 0;
+
+            if (r > 255) r = 255;
+            if (g > 255) g = 255;
+            if (b > 255) b = 255;
+
+            out->setPixelColor(x, y, QColor(r, g, b));
+        }
+    }
+
+    return out;
+}
+
+QList<QRect*>* ImageTransform::rectsOfInterest(QImage *image)
+{
+    int width = image->width();
+    int height = image->height();
+
+    QImage* poi = new QImage(image->size(), QImage::Format_ARGB32);
+    poi->fill(Qt::black);
+
+    for (int y = 6; y < height - 6; y++) {
+        for (int x = 6; x < width - 6; x++) {
+
+            int px =  image->pixelColor(x, y).red();
+
+            if (px > 128) {
+                int interestingPixels = 0;
+                int totalPixels = 0;
+                for (int dy = -5; dy <= 5; dy++) {
+                    for (int dx = -5; dx <= 5; dx++) {
+                        int px1 = image->pixelColor(x + dx, y + dy).red();
+                        if (px1 > 128)
+                            interestingPixels++;
+                        totalPixels++;
+                    }
+                }
+
+                if (interestingPixels > (totalPixels / 8)) {    // more than 1/4 of neighbour pixels are interesting
+                    poi->setPixelColor(x, y, Qt::white);
+                }
+            }
+
+        }
+    }
+
+    QList<QRect*>* rects = new QList<QRect*>();
+    QRect r;
+
+    for (int y = 6; y < height - 6; y++) {
+        for (int x = 6; x < width - 6; x++) {
+            int px =  poi->pixelColor(x, y).red();
+            if (px > 128) {
+                QRect* neigbourRect = nextNeighbourRect(rects, QPoint(x, y));
+
+                if (neigbourRect == NULL) { // We need to create a new rect
+                    rects->append(new QRect(x, y, 1, 1));
+                } else {    // we need to make an existing rect bigger
+                    QRect united = neigbourRect->united(QRect(x, y, 1, 1));
+                    *neigbourRect = united;
+                }
+            }
+        }
+    }
+
+
+    delete poi;
+    return rects;
+}
+
+QRect *ImageTransform::nextNeighbourRect(QList<QRect*> *rects, QPoint pos)
+{
+    foreach (QRect* rect, *rects) {
+        if ((rect->center() - pos).manhattanLength() < 50)
+            return rect;
+    }
+    return NULL;
 }

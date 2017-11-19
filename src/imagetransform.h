@@ -9,6 +9,8 @@
 #include <QImage>
 #include <math.h>
 #include <QVector3D>
+#include <QList>
+#include <QRect>
 
 class ImageTransform : public QObject
 {
@@ -26,10 +28,12 @@ public:
     static QImage *highPassFilter(QImage *source);
     QPolygonF findVerticesOfImage(QImage image, quint32 threshold, qint32 hitsNeeded);
     QImage* rotateImage(char direction, QImage *image);
-    QImage medianFilter(QImage* inputImage);
+    QImage *medianFilter(QImage* inputImage);
+    QList<QRect *> *rectsOfInterest(QImage* image);
 
 private:
     QImage* medianShadow;
+    QRect* nextNeighbourRect(QList<QRect *> *rects, QPoint pos);
 };
 
 #endif // IMAGETRANSFORM_H

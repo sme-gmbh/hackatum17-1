@@ -7,6 +7,8 @@
 #include <QImage>
 #include <QPixmap>
 #include <QMessageBox>
+#include <QPainter>
+#include <QPen>
 
 #include "imagetransform.h"
 
@@ -86,6 +88,34 @@ void MainWindow::processImage(QImage *image)
     QImage* hpfImage = ImageTransform::highPassFilter(image);
     ui->label_highPassFilter->setPixmap(QPixmap::fromImage(*hpfImage));
 
-    ui->label_medianFilter->setPixmap(QPixmap::fromImage(imageTransform.medianFilter(hpfImage)));
+    QImage* median = imageTransform.medianFilter(hpfImage);
+    ui->label_medianFilter->setPixmap(QPixmap::fromImage(*median));
+    QList<QRect*> *rectsOfInterest = imageTransform.rectsOfInterest(median);
+
+    delete median;
     delete hpfImage;
+
+    QImage* logoMask = new QImage(image->size(), QImage::Format_ARGB32);
+    logoMask->fill(QColor (0, 0, 0, 0));
+
+    QPainter painter(logoMask);
+    QPen pen;
+    pen.setColor(Qt::red);
+    pen.setWidth(3);
+    painter.setPen(Qt::red);
+
+    foreach(QRect* rect, *rectsOfInterest) {
+        painter.drawRect(*rect);
+    }
+
+    painter.end();
+
+    ui->label_logoMask->setPixmap(QPixmap::fromImage(*logoMask));
+
+    delete logoMask;
+    foreach(QRect* rect, *rectsOfInterest) {
+        delete rect;
+    }
+    rectsOfInterest->clear();
+    delete rectsOfInterest;
 }
