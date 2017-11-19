@@ -645,7 +645,7 @@ QList<QRect*>* ImageTransform::rectsOfInterest(QImage *image)
 QRect *ImageTransform::nextNeighbourRect(QList<QRect*> *rects, QPoint pos)
 {
     foreach (QRect* rect, *rects) {
-        if ((rect->center() - pos).manhattanLength() < 50)
+        if ((rect->center() - pos).manhattanLength() < 25)
             return rect;
     }
     return NULL;

@@ -92,9 +92,6 @@ void MainWindow::processImage(QImage *image)
     ui->label_medianFilter->setPixmap(QPixmap::fromImage(*median));
     QList<QRect*> *rectsOfInterest = imageTransform.rectsOfInterest(median);
 
-    delete median;
-    delete hpfImage;
-
     QImage* logoMask = new QImage(image->size(), QImage::Format_ARGB32);
     logoMask->fill(QColor (0, 0, 0, 0));
 
@@ -104,10 +101,33 @@ void MainWindow::processImage(QImage *image)
     pen.setWidth(3);
     painter.setPen(Qt::red);
 
+    QFont font;
+    font.setPointSize(20);
+    painter.setFont(font);
+
     foreach(QRect* rect, *rectsOfInterest) {
-        rect->adjust(-3, -3, 3, 3);
+        if ((rect->width() < 10) || (rect->height() < 10)) continue;
+        rect->adjust(-8, -8, 8, 8);
         painter.drawImage(*rect, *image, *rect);
         painter.drawRect(*rect);
+
+        QImage imageToTest = hpfImage->copy(*rect);
+
+        QString filename = findImage(imageToTest);
+        if (!filename.isEmpty()) {
+            QImage* detectedLogo = new QImage(filename);
+            filename = QDir(QFileInfo(filename).absolutePath()).dirName();
+
+            ui->label_detectedStation->setPixmap(QPixmap::fromImage(*detectedLogo));
+            delete detectedLogo;
+        }
+        else
+            filename = "";
+
+        if (rect->center().x() < (image->size().width() / 2))
+            painter.drawText(rect->adjusted(0, 0, 20, 0).bottomRight(), filename);
+        else
+            painter.drawText(rect->adjusted(-200, 0, 0, 0).bottomLeft(), filename);
     }
 
     painter.end();
@@ -120,6 +140,8 @@ void MainWindow::processImage(QImage *image)
     }
     rectsOfInterest->clear();
     delete rectsOfInterest;
+    delete median;
+    delete hpfImage;
 }
 
 void MainWindow::addReferenceImage(QString filename, QString stationName)
@@ -137,6 +159,7 @@ void MainWindow::addReferenceImage(QString filename, QString stationName)
             item->setIcon(0, QIcon(QPixmap::fromImage(image.scaledToHeight(64, Qt::SmoothTransformation))));
 
             ui->treeWidget_trainingImages->topLevelItem(i)->addChild(item);
+            treeItems.append(item);
             return;
         }
     }
@@ -196,38 +219,65 @@ void MainWindow::on_treeWidget_trainingImages_currentItemChanged(QTreeWidgetItem
     }
 }
 
-QPoint MainWindow::findImage(QImage big, QImage small)
+QString MainWindow::findImage(QImage big)
 {
     QPoint bestPosition;
-    double bestBonus = 0;
+    double bestBonus = 0.0;
+    double secondBestBonus = 0.0;
     double currentBonus = 0.0;
 
     int bigSizeX = big.size().width();
     int bigSizeY = big.size().height();
-    int smallSizeX = small.size().width();
-    int smallSizeY = small.size().height();
 
-    int offsetXmax = bigSizeX - smallSizeX;
-    int offsetYmax = bigSizeY - smallSizeY;
+    QString foundFilename;
 
-    for (int offsetY = 0; offsetY <= offsetYmax; offsetY++) {
-        for (int offsetX = 0; offsetX < offsetXmax; offsetX++) {
-            currentBonus = 0.0;
-            QImage cutout = big.copy(offsetX, offsetY, smallSizeX, smallSizeY);
+    foreach (QTreeWidgetItem* item, treeItems) {
+        QString filename = item->text(1);
+        QImage *tmp = new QImage(filename);
 
-            for (int x = 0; x < smallSizeX; x++) {
-                for (int y = 0; y < smallSizeY; y++) {
-                    currentBonus += cutout.pixelColor(x, y).redF() * small.pixelColor(x, y).redF();
+        if (tmp->isNull())
+            QMessageBox::warning(this, "findImage", "image is NULL!");
+
+        for (int s = 7; s < 80; s++) {
+            QImage tmp2 = tmp->scaledToHeight(s, Qt::SmoothTransformation);
+            QImage *small = imageTransform.highPassFilter(&tmp2);
+            ui->label_detectedStation->setPixmap(QPixmap::fromImage(*small));
+            qApp->processEvents();
+
+            int smallSizeX = small->size().width();
+            int smallSizeY = small->size().height();
+
+            int offsetXmax = bigSizeX - smallSizeX - 1;
+            int offsetYmax = bigSizeY - smallSizeY - 1;
+
+            for (int offsetY = 0; offsetY <= offsetYmax; offsetY++) {
+                for (int offsetX = 0; offsetX < offsetXmax; offsetX++) {
+                    currentBonus = 0.0;
+                    QImage cutout = big.copy(offsetX, offsetY, smallSizeX, smallSizeY);
+
+                    for (int x = 0; x < smallSizeX; x++) {
+                        for (int y = 0; y < smallSizeY; y++) {
+                            currentBonus += cutout.pixelColor(x, y).redF() * small->pixelColor(x, y).redF();
+                        }
+                    }
+
+                    if (currentBonus > bestBonus) {
+                        secondBestBonus = bestBonus;
+                        bestBonus = currentBonus;
+                        bestPosition = QPoint(offsetX, offsetY);
+                        if (bestBonus > secondBestBonus + 20) {
+
+                        }
+                        foundFilename = filename;
+                    }
+
                 }
             }
-
-            if (currentBonus > bestBonus) {
-                bestBonus = currentBonus;
-                bestPosition = QPoint(offsetX, offsetY);
-            }
-
+            delete small;
         }
+        delete tmp;
     }
 
-    return bestPosition;
+
+    return foundFilename;;
 }
