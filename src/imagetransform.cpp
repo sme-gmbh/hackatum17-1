@@ -163,14 +163,14 @@ QImage* ImageTransform::highPassFilter(QImage* source)
         {
             quint32 distance = 0;
             distance += colorDistance(source->pixel(x, y), source->pixel(x-1, y));   // linkes Pixel
-            distance += colorDistance(source->pixel(x, y), source->pixel(x-1, y-1));   // linkes oberes Pixel
+            //distance += colorDistance(source->pixel(x, y), source->pixel(x-1, y-1));   // linkes oberes Pixel
             distance += colorDistance(source->pixel(x, y), source->pixel(x, y-1));   // oberes Pixel
-            distance += colorDistance(source->pixel(x, y), source->pixel(x+1, y-1));   // oberes rechtes Pixel
+            //distance += colorDistance(source->pixel(x, y), source->pixel(x+1, y-1));   // oberes rechtes Pixel
             distance += colorDistance(source->pixel(x, y), source->pixel(x+1, y));   // rechtes Pixel
-            distance += colorDistance(source->pixel(x, y), source->pixel(x+1, y+1));   // rechtes unteres Pixel
+            //distance += colorDistance(source->pixel(x, y), source->pixel(x+1, y+1));   // rechtes unteres Pixel
             distance += colorDistance(source->pixel(x, y), source->pixel(x, y+1));   // unteres Pixel
-            distance += colorDistance(source->pixel(x, y), source->pixel(x-1, y+1));   // unteres linkes Pixel
-            //distance /= 2;
+            //distance += colorDistance(source->pixel(x, y), source->pixel(x-1, y+1));   // unteres linkes Pixel
+            distance *= 2;
             //distance *= 2;        // war eingeschaltet
             if (distance > 255) distance = 255;
 //            if (distance < 180) distance = 0;   // war 180

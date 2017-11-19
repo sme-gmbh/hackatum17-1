@@ -53,7 +53,7 @@ private:
     QImage referenceImage;
 
     void loadReferenceImages();
-    QString findImage(QImage big);
+    QString findImage(QImage *big, QRect searchRect);
     void addImageToMap(QString filename, QImage image);
 
     QList<QTreeWidgetItem*> treeItems;
