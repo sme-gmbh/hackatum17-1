@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <QDir>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 
 #include "imagetransform.h"
 
@@ -37,6 +39,19 @@ private:
     ImageTransform imageTransform;
 
     void processImage(QImage *image);
+
+
+public:
+    void addReferenceImage(QString filename, QString stationName);
+
+private slots:
+    void on_treeWidget_trainingImages_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+
+private:
+    QImage referenceImage;
+
+    void loadReferenceImages();
+    QPoint findImage(QImage big, QImage small);
 };
 
 #endif // MAINWINDOW_H

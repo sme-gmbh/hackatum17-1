@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //timer.setTimerType(Qt::PreciseTimer);
     timer.setSingleShot(false);
     connect(&timer, SIGNAL(timeout()), this, SLOT(slot_timer_fired()));
-
+    loadReferenceImages();
 }
 
 MainWindow::~MainWindow()
@@ -120,4 +120,114 @@ void MainWindow::processImage(QImage *image)
     }
     rectsOfInterest->clear();
     delete rectsOfInterest;
+}
+
+void MainWindow::addReferenceImage(QString filename, QString stationName)
+{
+    for (int i=0; i< ui->treeWidget_trainingImages->topLevelItemCount(); i++) {
+        if (ui->treeWidget_trainingImages->topLevelItem(i)->text(0) == stationName) {
+            QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << "" << filename);
+
+            QImage image;
+            bool ok = image.load(filename);
+            if (!ok) {
+                QMessageBox::warning(this, "Failure", "Image could not be loaded: " + filename);
+            }
+
+            item->setIcon(0, QIcon(QPixmap::fromImage(image.scaledToHeight(64, Qt::SmoothTransformation))));
+
+            ui->treeWidget_trainingImages->topLevelItem(i)->addChild(item);
+            return;
+        }
+    }
+
+    // If program flow reaches this point, we do not have that station yet, so lets create it
+
+    QTreeWidgetItem* topLevelItem = new QTreeWidgetItem(QStringList() << stationName);
+    topLevelItem->setData(0, 1001, QVariant(QString("Station")));
+    ui->treeWidget_trainingImages->addTopLevelItem(topLevelItem);
+    QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << "" << filename);
+
+    QImage image;
+    bool ok = image.load(filename);
+    if (!ok) {
+        QMessageBox::warning(this, "Failure", "Image could not be loaded: " + filename);
+    }
+
+    item->setIcon(0, QIcon(QPixmap::fromImage(image.scaledToHeight(64, Qt::SmoothTransformation))));
+    topLevelItem->addChild(item);
+
+    ui->treeWidget_trainingImages->resizeColumnToContents(0);
+}
+
+void MainWindow::loadReferenceImages()
+{
+    QDir dir;
+    dir.setCurrent("etc/references");
+
+    QStringList dirs = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+
+    foreach(QString dirPath, dirs) {
+
+
+        QDir innerDir = QDir(dirPath);
+
+
+        if (!innerDir.exists()) {
+            QMessageBox::warning(this, "Warning", "Dir does not exist: " + innerDir.absolutePath());
+            continue;
+        }
+
+
+        QStringList filePaths = innerDir.entryList(QDir::Files);
+
+        foreach (QString filePath, filePaths) {
+            filePath.prepend(dirPath + "/");
+            addReferenceImage(QFileInfo(filePath).absoluteFilePath(), QDir(dirPath).dirName());
+        }
+    }
+}
+
+void MainWindow::on_treeWidget_trainingImages_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+{
+    if (current->data(0, 1001).toString() != "Station") {
+        referenceImage.load(current->text(1));
+        ui->label_trainingImage->setPixmap(QPixmap::fromImage(referenceImage));
+    }
+}
+
+QPoint MainWindow::findImage(QImage big, QImage small)
+{
+    QPoint bestPosition;
+    double bestBonus = 0;
+    double currentBonus = 0.0;
+
+    int bigSizeX = big.size().width();
+    int bigSizeY = big.size().height();
+    int smallSizeX = small.size().width();
+    int smallSizeY = small.size().height();
+
+    int offsetXmax = bigSizeX - smallSizeX;
+    int offsetYmax = bigSizeY - smallSizeY;
+
+    for (int offsetY = 0; offsetY <= offsetYmax; offsetY++) {
+        for (int offsetX = 0; offsetX < offsetXmax; offsetX++) {
+            currentBonus = 0.0;
+            QImage cutout = big.copy(offsetX, offsetY, smallSizeX, smallSizeY);
+
+            for (int x = 0; x < smallSizeX; x++) {
+                for (int y = 0; y < smallSizeY; y++) {
+                    currentBonus += cutout.pixelColor(x, y).redF() * small.pixelColor(x, y).redF();
+                }
+            }
+
+            if (currentBonus > bestBonus) {
+                bestBonus = currentBonus;
+                bestPosition = QPoint(offsetX, offsetY);
+            }
+
+        }
+    }
+
+    return bestPosition;
 }
