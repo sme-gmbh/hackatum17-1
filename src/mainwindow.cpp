@@ -187,12 +187,20 @@ void MainWindow::addReferenceImage(QString filename, QString stationName)
 }
 
 void MainWindow::addImageToMap(QString filename, QImage image) {
+
     QList<QImage*> list;
     for (int s = 10; s < 60; s++) {
-        QImage* tmp2 = imageTransform.highPassFilter(&image);
-        QImage* small = new QImage(tmp2->scaledToHeight(s, Qt::SmoothTransformation));
+        QString filename_s = filename + QString().setNum(s) + ".sjpg";
+        QImage* small;
+        if (QFile(filename_s).exists()) {
+            small->load(filename_s);
+        } else {
+            QImage* tmp2 = imageTransform.highPassFilter(&image);
+            small = new QImage(tmp2->scaledToHeight(s, Qt::SmoothTransformation));
+            delete tmp2;
+            small->save(filename_s, "JPG", 100);
+        }
         list.append(small);
-        delete tmp2;
     }
 
     referenceMap.insert(filename, list);
@@ -256,7 +264,7 @@ QString MainWindow::findImage(QImage big)
 //            QImage* small = new QImage(tmp2->scaledToHeight(s, Qt::SmoothTransformation));
             QImage* small = referenceMap.value(filename).at(s -10);
 
-            ui->label_detectedStation->setPixmap(QPixmap::fromImage(*small));
+            //ui->label_detectedStation->setPixmap(QPixmap::fromImage(*small));
             qApp->processEvents();
 
             int smallSizeX = small->size().width();
