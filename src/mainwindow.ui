@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1920</width>
+    <height>950</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>hackaTUM 2017 Rohde&amp;Schwarz Logo detection challenge</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow {
+	background-color: rgb(55, 55, 55);
+}
+
+QMainWindow::separator {
+	background-color: rgb(110, 110, 95);
+	width: 2px;
+	height: 2px;
+}
+
+QDockWidget {
+	background-color: rgb(55, 55, 55);
+	color: white;
+	border: 1px solid rgb(200, 200, 200);
+	titlebar-close-icon: url(:/ui/dockwidget/icons/close.svg);
+    titlebar-normal-icon: url(:/ui/dockwidget/icons/float.svg);
+}
+
+QDialog {
+	background-color: rgb(49, 49, 41);
+	color: white;
+	border: 1px solid rgb(200, 200, 200);
+}
+
+QLabel {
+	color: rgb(240, 250, 240);
+}
+
+QSpinBox, QDoubleSpinBox {
+	color: white;
+	padding-right: 20px;
+	background-color: rgb(59, 59, 51);
+	border: 1px solid rgb(200, 200, 200);
+	margin: 0;
+	padding: 0;
+	height: 20px;
+}
+
+QSpinBox::up-button, QSpinBox:down-button, QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
+    subcontrol-origin: border;
+    width: 30px;
+	border: 0;
+	border-left: 1px solid rgb(110, 110, 110);;
+	border-right: 1px solid rgb(200, 200, 200);
+	background: 0;
+	margin: 0;
+	padding-right: 2px;
+}
+
+QSpinBox::up-button, QDoubleSpinBox::up-button {
+	subcontrol-position: top right;
+	border-bottom: 1px solid rgb(110, 110, 110);;
+	margin-bottom: -1px;
+}
+
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+	subcontrol-position: bottom right;
+	border-top: 1px solid rgb(110, 110, 110);;
+}
+
+QSpinBox::up-button:hover, QSpinBox::down-button:hover, QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
+	background-color: rgb(110, 110, 95);
+}
+
+QSpinBox::up-button:pressed, QSpinBox::down-button:pressed, QDoubleSpinBox::up-button:pressed, QDoubleSpinBox::down-button:pressed {
+	background-color: rgb(150, 150, 130);
+}
+
+QSpinBox::up-arrow, QSpinBox::down-arrow, QDoubleSpinBox::up-arrow, QDoubleSpinBox::down-arrow {
+	width: 17px;
+	height: 17px;
+	padding-left: 7px;
+	padding-right: 6px;
+}
+
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow
+{
+	image: url(:/ui/3Dcontrols/icons/arrow_up.svg);
+}
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+	image: url(:/ui/3Dcontrols/icons/arrow_down.svg);
+}
+
+QSpinBox::up-arrow:disabled, QSpinBox::up-arrow:off, QSpinBox::down-arrow:disabled, QSpinBox::down-arrow:off,
+QDoubleSpinBox::up-arrow:disabled, QDoubleSpinBox::up-arrow:off, QDoubleSpinBox::down-arrow:disabled, QDoubleSpinBox::down-arrow:off {
+	/* off state when value is max or min */
+	background-color: rgb(110, 110, 95);
+	border-left: 1px solid rgb(110, 110, 110);;
+	border-right: 1px solid rgb(200, 200, 200);;
+}
+
+QComboBox {
+	color: white;
+	border: 1px solid rgb(200, 200, 200);
+	background-color: rgb(59, 59, 51);
+	padding: 0 10px 0 5px;
+	selection-background-color: rgb(150, 150, 130);
+	height: 20px;
+}
+
+QComboBox::drop-down {
+	subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 25px;
+	border: 0;
+	border-left: 1px solid rgb(110, 110, 110);
+}
+QComboBox::drop-down:hover {
+	background-color: rgb(110, 110, 95);
+}
+QComboBox::drop-down:pressed {
+	background-color: rgb(150, 150, 130);
+}
+QComboBox::drop-down:on {
+	background-color: rgb(150, 150, 130);
+}
+
+QComboBox::down-arrow {
+	image: url(:/ui/3Dcontrols/icons/arrow_down.svg);
+	width: 17px;
+	height: 17px;
+	border: 0;
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid rgb(200, 200, 200);
+	background-color: rgb(59, 59, 51);
+}
+
+QGroupBox {
+    background-color: rgb(49, 49, 41);
+	color: rgb(0, 200, 255);
+    border: 2px solid rgb(0, 200, 255);	
+    padding: 2px;
+	padding-top: 15px;
+    margin-top: 1ex;
+	padding-left: 5px;
+	padding-right: 3px;
+}
+
+QGroupBox::title {
+    background-color: rgb(59, 59, 51);
+	subcontrol-origin: margin;
+	subcontrol-position: top center;
+    padding: 0 3px;
+    background-color: rgb();
+}
+
+QDockWidget::title {
+    text-align: left; /* align the text to the left */
+    background: rgb(49, 49, 41);
+}
+
+QDialog::title {
+    text-align: left; /* align the text to the left */
+    background: rgb(49, 49, 41);
+    padding-left: 5px;
+}
+
+QDockWidget::close-button, QDockWidget::float-button {
+	border: 0;
+	/*border-left: 1px solid white;*/
+	padding: 0px;
+	icon-size: 30px; /* maximum icon size */
+}
+
+QDockWidget::close-button {
+	subcontrol-position: top right;
+    subcontrol-origin: margin;
+    position: absolute;
+    top: 0px; right: 0px; bottom: 0px;
+    width: 20px;
+	margin: 0 8px;
+}
+
+QDockWidget::float-button {
+	subcontrol-position: top right;
+    subcontrol-origin: margin;
+    position: absolute;
+    top: 0px; right: 36px; bottom: 0px;
+    width: 20px;
+	margin: 0 8px;
+}
+
+QDockWidget::close-button:hover, QDockWidget::float-button:hover {
+     background-color: rgb(110, 110, 95);
+}
+
+QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
+     background-color: rgb(150, 150, 130);
+}
+
+QTabWidget {
+	color: white;
+	background-color: rgb(49, 49, 41);
+	border: 0;
+	padding-left: 5px;
+}
+
+QTabWidget::pane {
+	border: 0;
+	margin: 0;
+	border-left: 2px solid white;
+	border-top: 2px solid white;
+	margin-left: -2px;
+}
+
+QTabBar {
+	background: rgb(49, 49, 41);
+}
+
+QTabBar::focus {
+	outline: none;
+}
+
+QTabBar::tab:top {
+	color: white;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	border: 0;
+	border-bottom: 2px solid white;
+}
+
+QTabBar::tab:!top {
+	color: white;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	border: 0;
+	border-right: 2px solid white;
+}
+
+QTabBar::tab:selected:top {
+	background-color: rgb(19, 156, 39);
+	color: white;
+	border-bottom: 0;
+	border-top: 2px solid white;
+	border-left: 2px solid white;
+	border-right: 2px solid white;
+	border-top-right-radius: 8px;
+}
+
+QTabBar::tab:selected:!top {
+	background-color: rgb(19, 156, 39);
+	color: white;
+	border-right: 0;
+	border-top: 2px solid white;
+	border-left: 2px solid white;
+	border-bottom: 2px solid white;
+	border-top-left-radius: 8px;
+}
+
+QTabBar::tab:hover:!selected:top {
+	background-color: rgb(110, 110, 95);
+	color: white;
+	border-top-right-radius: 8px;
+}
+
+QTabBar::tab:hover:!selected:!top {
+	background-color: rgb(110, 110, 95);
+	color: white;
+	border-top-left-radius: 8px;
+}
+
+QWidget#GeometryDisplayTitle {
+	background-color: rgb(49, 49, 41);
+}
+
+QLabel {
+	color: rgb(240, 250, 240);
+}
+
+QPushButton {
+	color: rgb(230, 230, 230);
+	background-color: rgb(59, 59, 51);
+	border: 1px solid rgb(200, 200, 200);
+}
+QPushButton#pushButtonSolid {
+	border-right: 1px solid rgb(200, 200, 200);
+}
+QPushButton:hover {
+	background-color: rgb(110, 110, 95);
+}
+QPushButton:pressed {
+	background-color: rgb(150, 150, 130);
+}
+QPushButton:checked {
+	background-color: rgb(19, 156, 39);
+}
+
+QDoubleSpinBox {
+	color: white;
+	padding-right: 20px;
+	background-color: rgb(59, 59, 51);
+	border: 0;
+	border-left: 1px solid rgb(200, 200, 200);
+	margin: 0;
+	padding: 0;
+	height: 20px;
+}
+
+QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
+    subcontrol-origin: border;
+    width: 30px;
+	border: 0;
+	border-left: 1px solid rgb(110, 110, 110);;
+	border-right: 1px solid rgb(200, 200, 200);
+	background: 0;
+	margin: 0;
+	padding-right: 2px;
+}
+QDoubleSpinBox::up-button {
+	subcontrol-position: top right;
+	border-bottom: 1px solid rgb(110, 110, 110);;
+	margin-bottom: -1px;
+}
+QDoubleSpinBox::down-button {
+	subcontrol-position: bottom right;
+	border-top: 1px solid rgb(110, 110, 110);;
+}
+
+QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
+	background-color: rgb(110, 110, 95);
+}
+
+QDoubleSpinBox::up-button:pressed, QDoubleSpinBox::down-button:pressed {
+	background-color: rgb(150, 150, 130);
+}
+
+QDoubleSpinBox::up-arrow, QDoubleSpinBox::down-arrow {
+	width: 17px;
+	height: 17px;
+	padding-left: 7px;
+	padding-right: 6px;
+}
+QDoubleSpinBox::up-arrow
+{
+	image: url(:/ui/3Dcontrols/icons/arrow_up.svg);
+}
+QDoubleSpinBox::down-arrow {
+	image: url(:/ui/3Dcontrols/icons/arrow_down.svg);
+}
+QDoubleSpinBox::up-arrow:disabled, QDoubleSpinBox::up-arrow:off,
+QDoubleSpinBox::down-arrow:disabled, QDoubleSpinBox::down-arrow:off {
+	/* off state when value is max or min */
+	background-color: rgb(110, 110, 95);
+	border-left: 1px solid rgb(110, 110, 110);;
+	border-right: 1px solid rgb(200, 200, 200);;
+}
+
+QComboBox {
+	border: 0;
+	border-left: 1px solid rgb(200, 200, 200);
+	border-right: 1px solid rgb(200, 200, 200);
+}</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item row="4" column="2">
+     <widget class="QGroupBox" name="groupBox_controls">
+      <property name="title">
+       <string>Controls</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_6">
+       <item row="0" column="0">
+        <widget class="QPushButton" name="pushButton_play_pause">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>128</width>
+           <height>32</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Play</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QSpinBox" name="spinBox_fps">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>128</width>
+           <height>48</height>
+          </size>
+         </property>
+         <property name="maximum">
+          <number>25</number>
+         </property>
+         <property name="value">
+          <number>10</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Frames per Second</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="10" column="0">
+     <widget class="QGroupBox" name="groupBox_median">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title">
+       <string>Median Filter</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_medianFilter">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>725</width>
+           <height>420</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 0;</string>
+         </property>
+         <property name="text">
+          <string>No image</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QGroupBox" name="groupBox_highPassFilter">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title">
+       <string>High Pass Filter</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_highPassFilter">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>725</width>
+           <height>420</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 0;</string>
+         </property>
+         <property name="text">
+          <string>No image</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QGroupBox" name="groupBox_input">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title">
+       <string>Input Stream</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_inputStream">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>725</width>
+           <height>420</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 0;</string>
+         </property>
+         <property name="text">
+          <string>No image</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="4" column="3" rowspan="7">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="10" column="1">
+     <widget class="QGroupBox" name="groupBox_logoMask">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title">
+       <string>Logo Mask</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_logoMask">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>725</width>
+           <height>420</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 0;</string>
+         </property>
+         <property name="text">
+          <string>No image</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="12" column="0">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="11" column="0" colspan="2">
+     <widget class="QLabel" name="label_filename">
+      <property name="text">
+       <string>No file</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1920</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>Fi&amp;le</string>
+    </property>
+    <addaction name="actionOpen_folder"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionOpen_folder">
+   <property name="text">
+    <string>Open folder</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
