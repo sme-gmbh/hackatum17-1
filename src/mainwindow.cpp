@@ -160,6 +160,7 @@ void MainWindow::addReferenceImage(QString filename, QString stationName)
 
             ui->treeWidget_trainingImages->topLevelItem(i)->addChild(item);
             treeItems.append(item);
+            addImageToMap(filename, image);
             return;
         }
     }
@@ -179,8 +180,22 @@ void MainWindow::addReferenceImage(QString filename, QString stationName)
 
     item->setIcon(0, QIcon(QPixmap::fromImage(image.scaledToHeight(64, Qt::SmoothTransformation))));
     topLevelItem->addChild(item);
+    treeItems.append(item);
+    addImageToMap(filename, image);
 
     ui->treeWidget_trainingImages->resizeColumnToContents(0);
+}
+
+void MainWindow::addImageToMap(QString filename, QImage image) {
+    QList<QImage*> list;
+    for (int s = 10; s < 60; s++) {
+        QImage* tmp2 = imageTransform.highPassFilter(&image);
+        QImage* small = new QImage(tmp2->scaledToHeight(s, Qt::SmoothTransformation));
+        list.append(small);
+        delete tmp2;
+    }
+
+    referenceMap.insert(filename, list);
 }
 
 void MainWindow::loadReferenceImages()
@@ -233,14 +248,14 @@ QString MainWindow::findImage(QImage big)
 
     foreach (QTreeWidgetItem* item, treeItems) {
         QString filename = item->text(1);
-        QImage *tmp = new QImage(filename);
+//        QImage *tmp = new QImage(filename);
 
-        if (tmp->isNull())
-            QMessageBox::warning(this, "findImage", "image is NULL!");
 
-        for (int s = 7; s < 80; s++) {
-            QImage tmp2 = tmp->scaledToHeight(s, Qt::SmoothTransformation);
-            QImage *small = imageTransform.highPassFilter(&tmp2);
+        for (int s = 10; s < 60; s++) {
+//            QImage* tmp2 = imageTransform.highPassFilter(tmp);
+//            QImage* small = new QImage(tmp2->scaledToHeight(s, Qt::SmoothTransformation));
+            QImage* small = referenceMap.value(filename).at(s -10);
+
             ui->label_detectedStation->setPixmap(QPixmap::fromImage(*small));
             qApp->processEvents();
 
@@ -275,7 +290,6 @@ QString MainWindow::findImage(QImage big)
             }
             delete small;
         }
-        delete tmp;
     }
 
 

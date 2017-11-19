@@ -7,6 +7,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QImage>
+#include <QMap>
 
 #include "imagetransform.h"
 
@@ -53,8 +54,10 @@ private:
 
     void loadReferenceImages();
     QString findImage(QImage big);
+    void addImageToMap(QString filename, QImage image);
 
     QList<QTreeWidgetItem*> treeItems;
+    QMap<QString,QList<QImage*>> referenceMap;
 };
 
 #endif // MAINWINDOW_H
